@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User List</title>
+    <script>
+        function storeToken() {
+            const token = "{{ token }}"; // Get the token from Django template
+            if (token) {
+                localStorage.setItem('token', token); // Store the token in local storage
+                console.log("Token stored in localStorage");
+            }
+        }
+    </script>
+</head>
+<body onload="storeToken()">
+
+    <h1>User List</h1>
+    
+    <p>Your token: {{ token }}</p>
+
+
+</body>
+</html>

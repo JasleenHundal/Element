@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Actions</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Actions</h1>
+    <button id="get-clients">Get All Clients</button>
+    <button id="get-client">Get Client Details</button>
+    <button id="delete-client">Delete Client</button>
+    <button id="update-client">Update Client</button>
+    <div id="client-list">
+        <!-- Client data will be loaded here after button click -->
+    </div>
+
+    <script>
+        function setupAjax() {
+            $.ajaxSetup({
+                beforeSend: function(xhr) {
+                    const token = localStorage.getItem('token');
+                    if (token) {
+                        xhr.setRequestHeader('Authorization', 'Token ' + token);
+                    }
+                }
+            });
+        }
+
+        function fetchClients() {
+            $.ajax({
+                url: '/api/clients/',
+                method: 'GET',
+                success: function(data) {
+                    // Process and display data
+                    $('#client-list').html(JSON.stringify(data));
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error("Error fetching clients:", error);
+                }
+            });
+        }
+
+        function getClientDetails(clientId) {
+            $.ajax({
+                url: `/api/clients/${clientId}`,
+                method: 'GET',
+                success: function(data) {
+                    // Process and display data
+                    $('#client-list').html(JSON.stringify(data));
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error("Error fetching client details:", error);
+                }
+            });
+        }
+
+        function deleteClient(clientId) {
+            $.ajax({
+                url: `/api/clients/${clientId}`,
+                method: 'DELETE',
+                success: function() {
+                    alert("Client deleted successfully");
+                    // Optionally refresh client list
+                    fetchClients();
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error("Error deleting client:", error);
+                }
+            });
+        }
+
+        function updateClientDetails(clientId, updatedData) {
+            $.ajax({
+                url: `/api/clients/${clientId}`,
+                method: 'PUT',
+                data: updatedData,
+                success: function() {
+                    alert("Client updated successfully");
+                    // Optionally refresh client list
+                    fetchClients();
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error("Error updating client:", error);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            setupAjax();
+
+            $('#get-clients').on('click', function() {
+                fetchClients();
+            });
+
+            $('#get-client').on('click', function() {
+                var clientId = prompt("Enter the client ID:");
+                if(clientId) {
+                    getClientDetails(clientId);
+                }
+            });
+
+            $('#delete-client').on('click', function() {
+                var clientId = prompt("Enter the client ID to delete:");
+                if(clientId) {
+                    deleteClient(clientId);
+                }
+            });
+
+            $('#update-client').on('click', function() {
+                var clientId = prompt("Enter the client ID to update:");
+                if(clientId) {
+                    var updatedData = {}; // Collect updated data here
+                    updateClientDetails(clientId, updatedData);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

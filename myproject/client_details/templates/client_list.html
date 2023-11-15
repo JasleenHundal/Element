@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clients</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Clients</h1>
+    <div id="client-list">
+        <!-- Client data will be loaded here -->
+    </div>
+
+    <script>
+        // Function to set up the AJAX request with the token
+        function setupAjax() {
+            $.ajaxSetup({
+                beforeSend: function(xhr) {
+                    // Retrieve the token from local storage
+                    const token = localStorage.getItem('token');
+                    console.log('Token from localStorage:', token); // Log the token to the console
+                    if (token) {
+                        // If a token is found, add it to the Authorization header
+                        xhr.setRequestHeader('Authorization', 'Token ' + token);
+                    } else {
+                        // If no token is found, log a warning
+                        console.log('No token found in localStorage.');
+                    }
+                }
+            });
+        }
+        
+        // Call this function once before any AJAX requests are made
+        setupAjax();
+        
+        // When the page is ready, make the AJAX call to get client data
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/clients/',
+                method: 'GET',
+                success: function(data) {
+                    let html = '';
+                    if (data && Array.isArray(data.results)) { // Check if data has a results property that is an array
+                        for (let client of data.results) { // Iterate over the results array
+                            html += `<p>${client.org_name} - ${client.project_name}</p>`;
+                        }
+                    } else {
+                        // Handle non-array 'results' or absence of 'results'
+                        console.error('Expected an array inside the results property, but got:', data);
+                        html = '<p>Error: Data is not iterable. Check the console for more details.</p>';
+                    }
+                    $('#client-list').html(html);
+                },
+                
+                
+                error: function(xhr, status, error) {
+                    // If there's an error, log it to the console
+                    console.error('AJAX Error:', xhr.responseText);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
